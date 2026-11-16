@@ -78,19 +78,19 @@ export const getDashboardResponseRecentPaymentsItemOneDescriptionMax = 1000;
 
 
 export const GetDashboardResponse = zod.object({
-  "totalRequests": zod.number().int(),
-  "verifiedPayments": zod.number().int(),
-  "pendingPayments": zod.number().int(),
-  "mismatchedPayments": zod.number().int(),
-  "duplicateAttempts": zod.number().int(),
-  "manualReview": zod.number().int(),
+  "totalRequests": zod.int(),
+  "verifiedPayments": zod.int(),
+  "pendingPayments": zod.int(),
+  "mismatchedPayments": zod.int(),
+  "duplicateAttempts": zod.int(),
+  "manualReview": zod.int(),
   "totalVerifiedAmount": zod.number(),
   "totalRequestedAmount": zod.number(),
-  "bankRecordCount": zod.number().int(),
-  "unmatchedBankCount": zod.number().int(),
+  "bankRecordCount": zod.int(),
+  "unmatchedBankCount": zod.int(),
   "statusBreakdown": zod.array(zod.object({
   "status": zod.enum(['VERIFIED', 'PENDING', 'MISMATCH', 'DUPLICATE', 'MANUAL_REVIEW']),
-  "count": zod.number().int(),
+  "count": zod.int(),
   "amount": zod.number()
 })),
   "trend": zod.array(zod.object({
@@ -109,7 +109,7 @@ export const GetDashboardResponse = zod.object({
   "currency": zod.string(),
   "status": zod.enum(['VERIFIED', 'PENDING', 'MISMATCH', 'DUPLICATE', 'MANUAL_REVIEW']),
   "createdAt": zod.string(),
-  "receiptCount": zod.number().int()
+  "receiptCount": zod.int()
 }))),
   "recentActivity": zod.array(zod.object({
   "id": zod.string(),
@@ -169,7 +169,7 @@ export const ListPaymentsResponseItem = zod.object({
   "currency": zod.string(),
   "status": zod.enum(['VERIFIED', 'PENDING', 'MISMATCH', 'DUPLICATE', 'MANUAL_REVIEW']),
   "createdAt": zod.string(),
-  "receiptCount": zod.number().int()
+  "receiptCount": zod.int()
 }))
 export const ListPaymentsResponse = zod.array(ListPaymentsResponseItem)
 
@@ -214,7 +214,7 @@ export const CreatePaymentResponse = zod.object({
   "currency": zod.string(),
   "status": zod.enum(['VERIFIED', 'PENDING', 'MISMATCH', 'DUPLICATE', 'MANUAL_REVIEW']),
   "createdAt": zod.string(),
-  "receiptCount": zod.number().int()
+  "receiptCount": zod.int()
 }))
 
 
@@ -256,7 +256,7 @@ export const GetPaymentResponse = zod.object({
   "currency": zod.string(),
   "status": zod.enum(['VERIFIED', 'PENDING', 'MISMATCH', 'DUPLICATE', 'MANUAL_REVIEW']),
   "createdAt": zod.string(),
-  "receiptCount": zod.number().int()
+  "receiptCount": zod.int()
 })),
   "receipts": zod.array(zod.object({
   "amount": zod.number().min(getPaymentResponseReceiptsItemOneAmountMin).max(getPaymentResponseReceiptsItemOneAmountMax).nullable(),
@@ -327,9 +327,9 @@ export const ListBankTransactionsResponse = zod.array(ListBankTransactionsRespon
 export const ListImportsResponseItem = zod.object({
   "id": zod.string(),
   "fileName": zod.string(),
-  "imported": zod.number().int(),
-  "duplicates": zod.number().int(),
-  "rejected": zod.number().int(),
+  "imported": zod.int(),
+  "duplicates": zod.int(),
+  "rejected": zod.int(),
   "errors": zod.array(zod.string()),
   "createdAt": zod.string()
 })
@@ -350,9 +350,9 @@ export const ImportBankTransactionsBody = zod.object({
 export const ImportBankTransactionsResponse = zod.object({
   "id": zod.string(),
   "fileName": zod.string(),
-  "imported": zod.number().int(),
-  "duplicates": zod.number().int(),
-  "rejected": zod.number().int(),
+  "imported": zod.int(),
+  "duplicates": zod.int(),
+  "rejected": zod.int(),
   "errors": zod.array(zod.string()),
   "createdAt": zod.string()
 })
@@ -367,7 +367,7 @@ export const requestReceiptUploadBodySizeMax = 10485760;
 export const RequestReceiptUploadBody = zod.object({
   "paymentId": zod.string(),
   "name": zod.string().min(1).max(requestReceiptUploadBodyNameMax),
-  "size": zod.number().int().min(1).max(requestReceiptUploadBodySizeMax),
+  "size": zod.int().min(1).max(requestReceiptUploadBodySizeMax),
   "contentType": zod.enum(['image/jpeg', 'image/png', 'application/pdf'])
 })
 
@@ -518,19 +518,19 @@ export const getReportsResponseSummaryRecentPaymentsItemOneDescriptionMax = 1000
 export const GetReportsResponse = zod.object({
   "generatedAt": zod.string(),
   "summary": zod.object({
-  "totalRequests": zod.number().int(),
-  "verifiedPayments": zod.number().int(),
-  "pendingPayments": zod.number().int(),
-  "mismatchedPayments": zod.number().int(),
-  "duplicateAttempts": zod.number().int(),
-  "manualReview": zod.number().int(),
+  "totalRequests": zod.int(),
+  "verifiedPayments": zod.int(),
+  "pendingPayments": zod.int(),
+  "mismatchedPayments": zod.int(),
+  "duplicateAttempts": zod.int(),
+  "manualReview": zod.int(),
   "totalVerifiedAmount": zod.number(),
   "totalRequestedAmount": zod.number(),
-  "bankRecordCount": zod.number().int(),
-  "unmatchedBankCount": zod.number().int(),
+  "bankRecordCount": zod.int(),
+  "unmatchedBankCount": zod.int(),
   "statusBreakdown": zod.array(zod.object({
   "status": zod.enum(['VERIFIED', 'PENDING', 'MISMATCH', 'DUPLICATE', 'MANUAL_REVIEW']),
-  "count": zod.number().int(),
+  "count": zod.int(),
   "amount": zod.number()
 })),
   "trend": zod.array(zod.object({
@@ -549,7 +549,7 @@ export const GetReportsResponse = zod.object({
   "currency": zod.string(),
   "status": zod.enum(['VERIFIED', 'PENDING', 'MISMATCH', 'DUPLICATE', 'MANUAL_REVIEW']),
   "createdAt": zod.string(),
-  "receiptCount": zod.number().int()
+  "receiptCount": zod.int()
 }))),
   "recentActivity": zod.array(zod.object({
   "id": zod.string(),
@@ -611,9 +611,9 @@ export const GetReportsResponse = zod.object({
   "imports": zod.array(zod.object({
   "id": zod.string(),
   "fileName": zod.string(),
-  "imported": zod.number().int(),
-  "duplicates": zod.number().int(),
-  "rejected": zod.number().int(),
+  "imported": zod.int(),
+  "duplicates": zod.int(),
+  "rejected": zod.int(),
   "errors": zod.array(zod.string()),
   "createdAt": zod.string()
 }))
