@@ -1,1 +1,2 @@
 - [Private storage access](private-storage-access.md) — the bundled GCS client may attempt unavailable project-ID discovery; keep Replit sidecar signing as the credential boundary.
+- [External hosting boundaries](external-hosting.md) — preserve Replit while preparing Vercel; external Clerk and storage require separate credentials and runtime checks.

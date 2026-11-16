@@ -1,7 +1,6 @@
 import { randomUUID, createHash } from "node:crypto";
 import { db, receipts, type ReceiptRow } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
-import { ObjectStorageService, signObjectURL } from "./objectStorage";
 import { Problem } from "./problem";
 import {
   createSupabaseReceiptDownloadUrl,
@@ -11,10 +10,16 @@ import {
   writeSupabaseReceipt,
 } from "./supabaseStorage";
 
-export const storage = new ObjectStorageService();
+// Vercel uses Supabase, not the Replit sidecar. Load the Replit SDK only when
+// that provider is actually used, so it cannot crash the Vercel cold start.
+async function replitStorage() {
+  const { ObjectStorageService, signObjectURL } = await import("./objectStorage");
+  return { storage: new ObjectStorageService(), signObjectURL };
+}
 const MAX = 10 * 1024 * 1024;
 export async function createReceiptUpload(): Promise<{ uploadURL: string; objectPath: string }> {
   if (isVercelRuntime()) return createSupabaseReceiptUpload();
+  const { storage } = await replitStorage();
   const uploadURL = await storage.getObjectEntityUploadURL();
   return { uploadURL, objectPath: storage.normalizeObjectEntityPath(uploadURL) };
 }
@@ -26,6 +31,7 @@ export async function createReceiptDownloadUrl(path: string, fileName: string): 
 
 async function signedPrivateObject(path: string, method: "GET" | "PUT") {
   if (!/^\/objects\/(?:uploads|receipts)\/[a-f0-9-]{36}$/.test(path)) throw new Problem(400, "Invalid receipt object path.");
+  const { storage, signObjectURL } = await replitStorage();
   const parts = storage.getPrivateObjectDir().replace(/^\//, "").split("/");
   const bucketName = parts.shift()!;
   const objectName = `${parts.join("/")}/${path.slice("/objects/".length)}`;

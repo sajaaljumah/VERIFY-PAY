@@ -6,7 +6,7 @@
       "framework": "express",
       "entrypoint": "src/vercel.ts",
       "installCommand": "pnpm install --frozen-lockfile",
-      "buildCommand": "pnpm run build"
+      "buildCommand": ""
     },
     "web": {
       "root": "artifacts/verify-pay",
