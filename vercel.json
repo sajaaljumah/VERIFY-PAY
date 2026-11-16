@@ -6,7 +6,7 @@
       "framework": "express",
       "entrypoint": "src/vercel.ts",
       "installCommand": "pnpm install --frozen-lockfile",
-      "buildCommand": ""
+      "buildCommand": "echo 'Using Vercel native Express compilation'"
     },
     "web": {
       "root": "artifacts/verify-pay",
