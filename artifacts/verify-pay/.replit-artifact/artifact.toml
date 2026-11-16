@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "VERIFY PAY"
+description = "Bilingual payment verification and reconciliation for Kuwaiti businesses, matching receipts to imported bank transactions with duplicate detection and clear audit history."
+version = "1.0.0"
+id = "artifacts/verify-pay"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22753
+
+[services.development]
+run = "pnpm --filter @workspace/verify-pay run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/verify-pay", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/verify-pay/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22753"
+BASE_PATH = "/"

@@ -1,0 +1,292 @@
+PROJECT: VERIFY PAY
+
+Smart Payment Verification & Reconciliation Platform
+
+1. PROJECT OVERVIEW
+
+Build a complete, modern FinTech MVP called VERIFY PAY.
+
+VERIFY PAY is a smart payment verification and reconciliation platform designed for small businesses, online stores, home-based businesses, and independent sellers in Kuwait.
+
+The platform solves a specific financial problem: businesses often receive screenshots or PDF receipts from customers as proof of bank transfers, but they cannot easily confirm whether the money was actually received.
+
+Fake receipts, duplicated receipts, incorrect transfer amounts, and delayed payments can lead to financial losses and operational problems.
+
+VERIFY PAY helps businesses verify payment claims by extracting transaction information from uploaded receipts and matching it against imported bank transaction records.
+
+The main goal is to reduce payment fraud, save business owners time, and make payment reconciliation easier.
+
+2. TARGET USERS
+
+* Small business owners.
+* Home-based businesses in Kuwait.
+* Instagram and online store sellers.
+* Independent service providers.
+* Small retail businesses.
+
+3. CORE FEATURES
+
+A. User Authentication
+
+* Sign up and login.
+* Business owner accounts.
+* Secure authentication.
+* Business profile management.
+* Logout functionality.
+
+B. Payment Request Management
+
+Allow business owners to create payment requests.
+
+Each request should contain:
+
+* Customer name.
+* Customer reference or order ID.
+* Expected payment amount.
+* Currency (KWD).
+* Payment description.
+* Creation date.
+* Payment status.
+
+Generate a unique payment reference for every request.
+
+C. Receipt Upload & OCR
+
+Allow customers or business owners to upload payment receipts in:
+
+* JPG
+* PNG
+* PDF
+
+Use OCR technology to extract available information, including:
+
+* Transfer amount.
+* Transaction date.
+* Transaction reference number.
+* Sender information, when available.
+* Receiver information, when available.
+
+Display the extracted information for review before verification.
+
+If information cannot be extracted confidently, allow manual correction.
+
+D. Payment Verification Engine
+
+This is the core feature of VERIFY PAY.
+
+Create a verification engine that compares the uploaded receipt information with imported bank transaction records.
+
+The engine should check:
+
+1. Whether a matching transaction exists.
+2. Whether the amount matches.
+3. Whether the transaction date is reasonable.
+4. Whether the transaction reference matches, when available.
+5. Whether the transaction has already been matched to another payment request.
+6. Whether the transaction is still unmatched.
+
+Display one of the following statuses:
+
+* VERIFIED: A matching transaction exists in the imported bank records.
+* PENDING: No matching transaction has been found yet.
+* MISMATCH: The receipt details do not match the available transaction records.
+* DUPLICATE: The same transaction has already been used.
+* MANUAL REVIEW: The system cannot confidently determine the result.
+
+Important: Never mark a payment as VERIFIED based only on an uploaded screenshot. Verification must depend on a matching transaction in the imported transaction records.
+
+E. Bank Transaction Import
+
+For the MVP, do not require direct bank API integration.
+
+Allow the business owner to upload a CSV file containing sample or exported bank transactions.
+
+Support fields such as:
+
+* Transaction ID.
+* Transaction reference.
+* Amount.
+* Date.
+* Description.
+* Sender or payer information, if available.
+
+Validate uploaded files and identify duplicate records.
+
+Build the system so that real bank API integrations can be added in the future.
+
+F. Duplicate Receipt Detection
+
+Implement duplicate detection using:
+
+* Transaction reference.
+* Transaction ID.
+* Receipt file hash.
+* Previously matched transactions.
+
+Warn the user if a receipt or transaction appears to have been used before.
+
+G. Business Dashboard
+
+Create a professional dashboard displaying:
+
+* Total payment requests.
+* Verified payments.
+* Pending payments.
+* Mismatched payments.
+* Duplicate payment attempts.
+* Total verified amount in KWD.
+
+Include a recent transactions table with filtering and search.
+
+H. Reports & History
+
+Allow business owners to:
+
+* View all payment verification attempts.
+* Search by customer or order ID.
+* Filter by payment status.
+* View transaction details.
+* Export reports as CSV.
+
+4. USER INTERFACE & DESIGN
+
+Create a premium, modern FinTech SaaS interface.
+
+Design direction:
+
+* Professional and trustworthy.
+* Minimal and clean.
+* Modern dashboard layout.
+* Rounded cards and buttons.
+* Clear typography.
+* Consistent spacing.
+* Responsive design for desktop, tablet, and mobile.
+
+Suggested color palette:
+
+* Dark navy: #101B35
+* Orange: #F36B3F
+* White: #FFFFFF
+* Light background: #F5F7FA
+* Green for verified payments.
+* Red for mismatches and duplicate warnings.
+* Amber for pending payments.
+
+Create the following pages:
+
+1. Landing Page
+2. Sign Up / Login
+3. Business Dashboard
+4. Create Payment Request
+5. Upload Receipt
+6. Verification Results
+7. Transaction History
+8. Reports
+9. Business Settings
+
+5. ARABIC & ENGLISH SUPPORT
+
+The application must support:
+
+* Arabic (RTL layout).
+* English (LTR layout).
+* Kuwait as the primary target market.
+* Kuwaiti Dinar (KWD) as the default currency.
+
+Include a language switcher in the navigation bar.
+
+6. TECHNICAL REQUIREMENTS
+
+Build a working full-stack MVP.
+
+Preferred stack:
+
+* Frontend: React + TypeScript.
+* Styling: Tailwind CSS.
+* Backend: Node.js.
+* Database: PostgreSQL or Supabase.
+* Authentication: Secure authentication system.
+* OCR: An OCR service or library capable of extracting receipt information.
+* File storage: Secure file storage.
+
+Use environment variables for all API keys and credentials.
+
+Implement:
+
+* Input validation.
+* Error handling.
+* Secure file uploads.
+* User-level data isolation.
+* Database relationships.
+* Responsive components.
+* Loading and empty states.
+
+7. MVP DEMO DATA
+
+Create realistic demo data for a Kuwaiti small business.
+
+Include:
+
+* 10 payment requests.
+* 10–15 sample bank transactions.
+* Multiple verified payments.
+* Pending payments.
+* Mismatched amounts.
+* Duplicate transaction examples.
+
+Use KWD as the currency.
+
+Make sure the demo allows users to experience the complete verification workflow.
+
+8. IMPORTANT BUSINESS LOGIC
+
+The platform must distinguish between:
+
+* Receipt authenticity and actual payment confirmation.
+* A receipt uploaded by a customer and a transaction recorded by a bank.
+* A matching transaction and a confirmed bank settlement.
+
+Do not claim that the platform has direct access to Kuwaiti bank accounts.
+
+For this MVP, imported bank transaction files are the source of transaction records.
+
+The system must never falsely claim that a payment has been received.
+
+9. MVP SUCCESS CRITERIA
+
+The MVP is considered complete when a business owner can:
+
+1. Create an account.
+2. Create a payment request.
+3. Upload a payment receipt.
+4. Extract transaction information using OCR.
+5. Import a bank transaction CSV file.
+6. Match receipt information against imported transactions.
+7. Detect duplicate transactions.
+8. Receive a clear verification result.
+9. View all payment records in the dashboard.
+10. Export a transaction report.
+
+All major buttons and workflows must work. Do not create decorative buttons or non-functional pages.
+
+10. DEVELOPMENT APPROACH
+
+Build the project in logical stages.
+
+Stage 1: Set up the application architecture, database, authentication, and design system.
+
+Stage 2: Build payment request management and transaction import.
+
+Stage 3: Implement OCR and the payment verification engine.
+
+Stage 4: Build the dashboard, history, reports, and duplicate detection.
+
+Stage 5: Implement Arabic and English support, responsive layouts, and testing.
+
+Before finishing, test the complete workflow using realistic demo data.
+
+The priority is to build a functional MVP that demonstrates the core financial solution, not just a visually attractive prototype.
+
+FINAL PRODUCT VISION:
+
+VERIFY PAY is not another budget tracker or expense management application. It is a payment verification and reconciliation solution that helps businesses protect themselves from fake payment claims and reduce the time spent checking incoming payments.

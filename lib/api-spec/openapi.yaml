@@ -1,36 +1,366 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: API specification
+  version: 1.0.0
+  description: VERIFY PAY payment verification and reconciliation API
 servers:
   - url: /api
-    description: Base API path
-tags:
-  - name: health
-    description: Health operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
-      tags: [health]
-      summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/HealthStatus"
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+  /vp/profile:
+    get:
+      operationId: getProfile
+      responses:
+        "200":
+          description: Business profile and demo state
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Profile" }
+    patch:
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfileInput" }
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Profile" }
+  /vp/dashboard:
+    get:
+      operationId: getDashboard
+      responses:
+        "200":
+          description: Summary of actual workspace records
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Dashboard" }
+  /vp/payments:
+    get:
+      operationId: listPayments
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/PaymentStatus" } }
+      responses:
+        "200":
+          description: Payment requests
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Payment" } }
+    post:
+      operationId: createPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PaymentInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Payment" }
+  /vp/payments/{id}:
+    get:
+      operationId: getPayment
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Payment detail and verification history
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentDetail" }
+  /vp/transactions:
+    get:
+      operationId: listBankTransactions
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Imported bank transaction records
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/BankTransaction" } }
+  /vp/imports:
+    get:
+      operationId: listImports
+      responses:
+        "200":
+          description: Import history
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/ImportRecord" } }
+    post:
+      operationId: importBankTransactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ImportInput" }
+      responses:
+        "201":
+          description: Validated import with per-row issues
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ImportRecord" }
+  /vp/receipts/upload-url:
+    post:
+      operationId: requestReceiptUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReceiptUploadInput" }
+      responses:
+        "201":
+          description: Private receipt record and signed direct upload URL
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReceiptUpload" }
+  /vp/receipts/{id}/extract:
+    post:
+      operationId: extractReceipt
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: OCR fields requiring user review
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Receipt" }
+  /vp/receipts/{id}/verify:
+    post:
+      operationId: verifyReceipt
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReceiptReview" }
+      responses:
+        "200":
+          description: Verification result against imported records only
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Attempt" }
+  /vp/attempts:
+    get:
+      operationId: listAttempts
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/PaymentStatus" } }
+      responses:
+        "200":
+          description: Verification audit history
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Attempt" } }
+  /vp/reports:
+    get:
+      operationId: getReports
+      responses:
+        "200":
+          description: Reconciliation report
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Report" }
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+    PaymentStatus:
+      type: string
+      enum: [VERIFIED, PENDING, MISMATCH, DUPLICATE, MANUAL_REVIEW]
+    ProfileInput:
+      type: object
+      required: [businessName, ownerName, email, language]
+      properties:
+        businessName: { type: string, minLength: 1, maxLength: 120 }
+        ownerName: { type: string, minLength: 1, maxLength: 120 }
+        email: { type: string, maxLength: 254 }
+        language: { type: string, enum: [en, ar] }
+    Profile:
+      allOf:
+        - { $ref: "#/components/schemas/ProfileInput" }
+        - type: object
+          required: [isDemo, currency]
+          properties:
+            isDemo: { type: boolean }
+            currency: { type: string }
+    PaymentInput:
+      type: object
+      required: [customerName, orderId, amount, description]
+      properties:
+        customerName: { type: string, minLength: 1, maxLength: 120 }
+        orderId: { type: string, minLength: 1, maxLength: 100 }
+        amount: { type: number, minimum: 0.001, maximum: 999999.999 }
+        description: { type: string, maxLength: 1000 }
+    Payment:
+      allOf:
+        - { $ref: "#/components/schemas/PaymentInput" }
+        - type: object
+          required: [id, reference, currency, status, createdAt, receiptCount]
+          properties:
+            id: { type: string }
+            reference: { type: string }
+            currency: { type: string }
+            status: { $ref: "#/components/schemas/PaymentStatus" }
+            createdAt: { type: string }
+            receiptCount: { type: integer }
+    ReceiptReview:
+      type: object
+      required: [amount, transactionDate, reference, sender, receiver]
+      properties:
+        amount: { type: ["number", "null"], minimum: 0.001, maximum: 999999.999 }
+        transactionDate: { type: string, maxLength: 10 }
+        reference: { type: string, maxLength: 200 }
+        sender: { type: string, maxLength: 200 }
+        receiver: { type: string, maxLength: 200 }
+    Receipt:
+      allOf:
+        - { $ref: "#/components/schemas/ReceiptReview" }
+        - type: object
+          required: [id, paymentId, fileName, contentType, createdAt, confidence, extractionNote, duplicateFile, fileUrl]
+          properties:
+            id: { type: string }
+            paymentId: { type: string }
+            fileName: { type: string }
+            contentType: { type: string }
+            createdAt: { type: string }
+            confidence: { type: string, enum: [high, medium, low, unprocessed] }
+            extractionNote: { type: string }
+            duplicateFile: { type: boolean }
+            fileUrl: { type: string }
+    ReceiptUploadInput:
+      type: object
+      required: [paymentId, name, size, contentType]
+      properties:
+        paymentId: { type: string }
+        name: { type: string, minLength: 1, maxLength: 255 }
+        size: { type: integer, minimum: 1, maximum: 10485760 }
+        contentType: { type: string, enum: [image/jpeg, image/png, application/pdf] }
+    ReceiptUpload:
+      type: object
+      required: [receiptId, uploadURL]
+      properties:
+        receiptId: { type: string }
+        uploadURL: { type: string }
+    BankTransaction:
+      type: object
+      required: [id, transactionId, reference, amount, date, description, sender, matchedPaymentId, importedAt]
+      properties:
+        id: { type: string }
+        transactionId: { type: string }
+        reference: { type: string }
+        amount: { type: number }
+        date: { type: string }
+        description: { type: string }
+        sender: { type: string }
+        matchedPaymentId: { type: ["string", "null"] }
+        importedAt: { type: string }
+    VerificationCheck:
+      type: object
+      required: [label, passed, detail]
+      properties:
+        label: { type: string }
+        passed: { type: ["boolean", "null"] }
+        detail: { type: string }
+    Attempt:
+      type: object
+      required: [id, paymentId, receiptId, customerName, orderId, reference, amount, status, reason, createdAt, checks, matchedTransaction]
+      properties:
+        id: { type: string }
+        paymentId: { type: string }
+        receiptId: { type: string }
+        customerName: { type: string }
+        orderId: { type: string }
+        reference: { type: string }
+        amount: { type: number }
+        status: { $ref: "#/components/schemas/PaymentStatus" }
+        reason: { type: string }
+        createdAt: { type: string }
+        checks: { type: array, items: { $ref: "#/components/schemas/VerificationCheck" } }
+        matchedTransaction:
+          anyOf:
+            - { $ref: "#/components/schemas/BankTransaction" }
+            - { type: "null" }
+    PaymentDetail:
+      type: object
+      required: [payment, receipts, attempts]
+      properties:
+        payment: { $ref: "#/components/schemas/Payment" }
+        receipts: { type: array, items: { $ref: "#/components/schemas/Receipt" } }
+        attempts: { type: array, items: { $ref: "#/components/schemas/Attempt" } }
+    ImportInput:
+      type: object
+      required: [fileName, csv]
+      properties:
+        fileName: { type: string, maxLength: 255 }
+        csv: { type: string, minLength: 1, maxLength: 2097152 }
+    ImportRecord:
+      type: object
+      required: [id, fileName, imported, duplicates, rejected, errors, createdAt]
+      properties:
+        id: { type: string }
+        fileName: { type: string }
+        imported: { type: integer }
+        duplicates: { type: integer }
+        rejected: { type: integer }
+        errors: { type: array, items: { type: string } }
+        createdAt: { type: string }
+    StatusCount:
+      type: object
+      required: [status, count, amount]
+      properties:
+        status: { $ref: "#/components/schemas/PaymentStatus" }
+        count: { type: integer }
+        amount: { type: number }
+    TrendPoint:
+      type: object
+      required: [date, verified, pending]
+      properties:
+        date: { type: string }
+        verified: { type: number }
+        pending: { type: number }
+    Dashboard:
+      type: object
+      required: [totalRequests, verifiedPayments, pendingPayments, mismatchedPayments, duplicateAttempts, manualReview, totalVerifiedAmount, totalRequestedAmount, bankRecordCount, unmatchedBankCount, statusBreakdown, trend, recentPayments, recentActivity]
+      properties:
+        totalRequests: { type: integer }
+        verifiedPayments: { type: integer }
+        pendingPayments: { type: integer }
+        mismatchedPayments: { type: integer }
+        duplicateAttempts: { type: integer }
+        manualReview: { type: integer }
+        totalVerifiedAmount: { type: number }
+        totalRequestedAmount: { type: number }
+        bankRecordCount: { type: integer }
+        unmatchedBankCount: { type: integer }
+        statusBreakdown: { type: array, items: { $ref: "#/components/schemas/StatusCount" } }
+        trend: { type: array, items: { $ref: "#/components/schemas/TrendPoint" } }
+        recentPayments: { type: array, items: { $ref: "#/components/schemas/Payment" } }
+        recentActivity: { type: array, items: { $ref: "#/components/schemas/Attempt" } }
+    Report:
+      type: object
+      required: [generatedAt, summary, attempts, imports]
+      properties:
+        generatedAt: { type: string }
+        summary: { $ref: "#/components/schemas/Dashboard" }
+        attempts: { type: array, items: { $ref: "#/components/schemas/Attempt" } }
+        imports: { type: array, items: { $ref: "#/components/schemas/ImportRecord" } }
