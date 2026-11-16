@@ -25,8 +25,8 @@ export function getDatabaseConnectionString(
     }
 
     // Require encrypted transport. pg v8 currently treats "require" as
-    // verify-full unless libpq compatibility is enabled; Supabase's pooler
-    // certificate therefore needs its CA bundle for certificate verification.
+    // verify-full unless libpq compatibility is enabled. This encrypts traffic
+    // but does not verify the pooler's certificate; verify-full needs its CA.
     url.searchParams.set("sslmode", "require");
     url.searchParams.set("uselibpqcompat", "true");
     return url.toString();
