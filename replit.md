@@ -40,7 +40,9 @@ Bilingual payment verification and reconciliation for small businesses, online s
 - Clerk and App Storage are provisioned through Replit.
 - `OPENAI_API_KEY` is supplied by the owner. OCR uses OpenAI's Responses API with `gpt-5-mini` for JPG/PNG/PDF extraction. Do not retry Replit AI Integration provisioning: the owner chose their own key.
 - If OpenAI rejects a key or has no quota, show a clear extraction warning and allow manual correction. Do not pretend extraction succeeded.
-- Required environment: managed `DATABASE_URL`, `SESSION_SECRET`, Clerk keys, App Storage configuration, and `OPENAI_API_KEY` for live OCR. Never log any values.
+- Development prefers `SUPABASE_POSTGRES_URL` for the configured Supabase session pooler; production continues using managed `DATABASE_URL` until its data is separately reviewed and migrated. Never log connection values.
+- The six Verify Pay tables in Supabase have RLS enabled and direct `anon`/`authenticated` grants revoked. The API connects as a bypass-RLS server role, so tenant isolation continues to depend on server-side `businessId` scoping.
+- Other required environment: `SESSION_SECRET`, Clerk keys, App Storage configuration, and `OPENAI_API_KEY` for live OCR. Never log any values.
 - Receipt validation: JPG/PNG/PDF signatures, size <=10 MB, declared byte count, tenant ownership. CSV: <=2 MB, <=5,000 rows, positive KWD credits, valid ISO dates, duplicate IDs/references skipped.
 - Backend storage operations use short-lived signed HTTP requests from Replit's sidecar rather than requiring application-managed Google credentials.
 
