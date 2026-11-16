@@ -5,7 +5,7 @@ import { eq, and, ne, sql } from "drizzle-orm";
 import { db, receipts, payments, bankTransactions, attempts } from "@workspace/db";
 import { RequestReceiptUploadBody, RequestReceiptUploadResponse, ExtractReceiptParams, ExtractReceiptResponse, VerifyReceiptParams, VerifyReceiptBody, VerifyReceiptResponse, GetPaymentParams } from "@workspace/api-zod";
 import { Problem } from "../lib/problem";
-import { storage, freezeReceipt, readObject } from "../lib/receipt-files";
+import { createReceiptDownloadUrl, createReceiptUpload, freezeReceipt, readObject } from "../lib/receipt-files";
 import { extractFields } from "../lib/ocr";
 import { isValidDate, toFils } from "../lib/money";
 import { evaluateReceipt } from "../lib/verification";
@@ -20,11 +20,11 @@ router.post("/receipts/upload-url", async (req, res): Promise<void> => {
   if (!p) throw new Problem(404, "Payment request not found.");
   const existing = await db.select({ id: receipts.id }).from(receipts).where(eq(receipts.businessId, req.businessId));
   if (existing.length >= (req.isDemo ? 50 : 5000)) throw new Problem(400, "Receipt limit for this workspace has been reached.");
-  const uploadURL = await storage.getObjectEntityUploadURL();
+  const { uploadURL, objectPath } = await createReceiptUpload();
   const receiptId = randomUUID();
   await db.insert(receipts).values({
     id: receiptId, businessId: req.businessId, paymentId: body.paymentId,
-    objectPath: storage.normalizeObjectEntityPath(uploadURL), fileName: body.name, contentType: body.contentType, expectedSize: body.size,
+    objectPath, fileName: body.name, contentType: body.contentType, expectedSize: body.size,
   });
   res.status(201).json(RequestReceiptUploadResponse.parse({ receiptId, uploadURL }));
 });
@@ -89,6 +89,11 @@ router.get("/receipts/:id/file", async (req, res): Promise<void> => {
     const [p] = await db.select().from(payments).where(and(eq(payments.id, r.paymentId), eq(payments.businessId, req.businessId)));
     if (!p) throw new Problem(404, "Payment not found.");
     sampleReceipt(res, p, r); return;
+  }
+  const signedUrl = await createReceiptDownloadUrl(r.objectPath, r.fileName);
+  if (signedUrl) {
+    res.redirect(302, signedUrl);
+    return;
   }
   const bytes = await readObject(r.objectPath);
   res.setHeader("X-Content-Type-Options", "nosniff");

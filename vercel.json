@@ -1,0 +1,39 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "api": {
+      "root": "artifacts/api-server",
+      "framework": "express",
+      "entrypoint": "src/vercel.ts",
+      "installCommand": "pnpm install --frozen-lockfile",
+      "buildCommand": "pnpm run build"
+    },
+    "web": {
+      "root": "artifacts/verify-pay",
+      "framework": "vite",
+      "installCommand": "pnpm install --frozen-lockfile",
+      "buildCommand": "PORT=22753 BASE_PATH=/ pnpm run build",
+      "outputDirectory": "dist/public",
+      "rewrites": [
+        {
+          "source": "/(.*)",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "web"
+      }
+    }
+  ]
+}
