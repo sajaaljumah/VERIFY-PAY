@@ -26,7 +26,7 @@ router.patch("/profile", async (req, res): Promise<void> => {
 });
 router.get("/dashboard", async (req, res): Promise<void> => { res.json(GetDashboardResponse.parse(await dashboard(req.businessId))); });
 router.get("/payments", async (req, res): Promise<void> => {
-  const q = ListPaymentsQueryParams.parse(req.query);
+  const q = ListPaymentsQueryParams.parse({ ...req.query, status: req.query.status || undefined });
   let rows = await db.select().from(payments).where(eq(payments.businessId, req.businessId)).orderBy(desc(payments.createdAt));
   if (q.status) rows = rows.filter((p) => p.status === q.status);
   if (q.search) { const s = q.search.toLowerCase(); rows = rows.filter((p) => `${p.customerName} ${p.orderId} ${p.reference}`.toLowerCase().includes(s)); }
@@ -54,7 +54,7 @@ router.get("/payments/:id", async (req, res): Promise<void> => {
   res.json(GetPaymentResponse.parse({ payment: await paymentJson(p), receipts: await Promise.all(rs.map(receiptJson)), attempts: await Promise.all(ats.map(attemptJson)) }));
 });
 router.get("/attempts", async (req, res): Promise<void> => {
-  const q = ListAttemptsQueryParams.parse(req.query);
+  const q = ListAttemptsQueryParams.parse({ ...req.query, status: req.query.status || undefined });
   let rows = await db.select().from(attempts).where(eq(attempts.businessId, req.businessId)).orderBy(desc(attempts.createdAt));
   if (q.status) rows = rows.filter((a) => a.status === q.status);
   if (q.search) { const s = q.search.toLowerCase(); rows = rows.filter((a) => `${a.customerName} ${a.orderId} ${a.reference}`.toLowerCase().includes(s)); }
@@ -67,7 +67,7 @@ const csvCell = (value: unknown) => {
   return `"${v.replace(/"/g, '""')}"`;
 };
 router.get("/export.csv", async (req, res): Promise<void> => {
-  const q = ListPaymentsQueryParams.parse(req.query);
+  const q = ListPaymentsQueryParams.parse({ ...req.query, status: req.query.status || undefined });
   let ps = await db.select().from(payments).where(eq(payments.businessId, req.businessId)).orderBy(desc(payments.createdAt));
   if (q.status) ps = ps.filter((p) => p.status === q.status);
   if (q.search) { const s = q.search.toLowerCase(); ps = ps.filter((p) => `${p.customerName} ${p.orderId} ${p.reference}`.toLowerCase().includes(s)); }

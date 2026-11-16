@@ -177,6 +177,50 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Report" }
+  /vp/export.csv:
+    get:
+      operationId: downloadPaymentReport
+      description: Download with an anchor; accepts optional search and status filters.
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: CSV report with three-decimal KWD amounts and demo labeling
+          content:
+            text/csv:
+              schema: { type: string }
+  /vp/sample-bank.csv:
+    get:
+      operationId: downloadBankTemplate
+      responses:
+        "200":
+          description: CSV import template with illustrative data
+          content:
+            text/csv:
+              schema: { type: string }
+  /vp/sample-receipt.pdf:
+    get:
+      operationId: downloadSampleReceipt
+      parameters:
+        - { name: paymentId, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Illustrative sample receipt available only in the demo workspace
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+  /vp/receipts/{id}/file:
+    get:
+      operationId: downloadReceiptFile
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Private receipt bytes; workspace ownership is checked before serving
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
 components:
   schemas:
     HealthStatus:

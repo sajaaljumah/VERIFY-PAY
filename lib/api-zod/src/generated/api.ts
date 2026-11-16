@@ -620,3 +620,31 @@ export const GetReportsResponse = zod.object({
 })
 
 
+/**
+ * Download with an anchor; accepts optional search and status filters.
+ */
+export const DownloadPaymentReportQueryParams = zod.object({
+  "search": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const DownloadPaymentReportResponse = zod.unknown()
+
+
+export const DownloadBankTemplateResponse = zod.unknown()
+
+
+export const DownloadSampleReceiptQueryParams = zod.object({
+  "paymentId": zod.coerce.string()
+})
+
+export const DownloadSampleReceiptResponse = zod.unknown()
+
+
+export const DownloadReceiptFileParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const DownloadReceiptFileResponse = zod.unknown()
+
+

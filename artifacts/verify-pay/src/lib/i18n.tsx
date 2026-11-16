@@ -18,7 +18,7 @@ const en = {
   try_demo: "Try the demo",
   open_workspace: "Open workspace",
   language: "Language",
-  demo_banner: "Demo workspace. Sample data lives only in this browser session and is never mixed with a real business.",
+  demo_banner: "Demo workspace. Sample data is private to this browser and is never mixed with a real business.",
   demo_banner_cta: "Start a real workspace",
   signed_in_as: "Signed in",
   guest: "Demo visitor",

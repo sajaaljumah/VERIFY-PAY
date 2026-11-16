@@ -4,10 +4,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, ArrowRight, Check, Download, FileText, Loader2, RotateCcw, UploadCloud } from "lucide-react";
 import {
   getGetDashboardQueryKey, getGetPaymentQueryKey, getGetReportsQueryKey, getListAttemptsQueryKey, getListBankTransactionsQueryKey, getListPaymentsQueryKey,
-  useExtractReceipt, useListPayments, useRequestReceiptUpload, useVerifyReceipt,
+  useExtractReceipt, useListPayments, useRequestReceiptUpload, useVerifyReceipt, useGetProfile,
   type Attempt, type Receipt, type ReceiptUploadInputContentType,
 } from "@workspace/api-client-react";
 import { useI18n } from "@/lib/i18n";
+import { systemText } from "@/lib/system-text";
 import { AMOUNT_RE, errMsg, fmtAmount } from "@/lib/format";
 import { btnGhost, btnPrimary, inputCls } from "@/lib/ui";
 import { cn } from "@/lib/utils";
@@ -22,7 +23,8 @@ type Fields = { amount: string; transactionDate: string; reference: string; send
 const EMPTY: Fields = { amount: "", transactionDate: "", reference: "", sender: "", receiver: "" };
 
 export default function UploadPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const profile = useGetProfile();
   const qc = useQueryClient();
   const search = useSearch();
   const initialPid = useMemo(() => new URLSearchParams(search).get("paymentId") ?? "", [search]);
@@ -155,7 +157,7 @@ export default function UploadPage() {
                   <div className="text-end"><p className="text-[0.68rem] text-muted-foreground">{t("expected")}</p><Money value={selected.amount} className="font-semibold" /></div>
                 </div>
               )}
-              {selected && (
+              {selected && profile.data?.isDemo && (
                 <a href={`/api/vp/sample-receipt.pdf?paymentId=${encodeURIComponent(selected.id)}`} className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground" data-testid="link-sample-receipt"><Download className="size-3.5" />{t("sample_receipt")}</a>
               )}
             </div>
@@ -261,7 +263,7 @@ export default function UploadPage() {
                   <StatusBadge status={attempt.status} size="lg" />
                   <Money value={attempt.amount} className="text-xl font-semibold" />
                 </div>
-                <p className="text-sm font-medium" data-testid="text-result-reason">{attempt.reason}</p>
+                <p className="text-sm font-medium" data-testid="text-result-reason">{systemText(attempt.reason, lang)}</p>
                 <CheckList checks={attempt.checks} />
                 <MatchedTx attempt={attempt} />
                 <Disclaimer compact />

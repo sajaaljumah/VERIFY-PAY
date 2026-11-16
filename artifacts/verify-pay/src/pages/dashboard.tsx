@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { ArrowUpRight, FileSearch, FileSpreadsheet, Plus, ReceiptText, Settings } from "lucide-react";
 import { useGetDashboard, type Dashboard } from "@workspace/api-client-react";
 import { useI18n } from "@/lib/i18n";
+import { systemText } from "@/lib/system-text";
 import { fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -91,7 +92,7 @@ function Trend({ d }: { d: Dashboard }) {
 }
 
 export default function DashboardPage() {
-  const { t, locale } = useI18n();
+  const { t, locale, lang } = useI18n();
   const q = useGetDashboard();
   const d = q.data;
   const pct = d && d.totalRequestedAmount > 0 ? (d.totalVerifiedAmount / d.totalRequestedAmount) * 100 : 0;
@@ -186,7 +187,7 @@ export default function DashboardPage() {
                         <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", STATUS_STYLE[a.status].dot)} />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold">{a.customerName} <span className="font-normal text-muted-foreground">· {t(`status_${a.status}`)}</span></p>
-                          <p className="line-clamp-1 text-xs text-muted-foreground">{a.reason}</p>
+                          <p className="line-clamp-1 text-xs text-muted-foreground">{systemText(a.reason, lang)}</p>
                         </div>
                         <span className="shrink-0 text-xs text-muted-foreground">{fmtDate(a.createdAt, locale)}</span>
                       </Link>

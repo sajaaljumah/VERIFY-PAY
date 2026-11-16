@@ -28,6 +28,8 @@ import type {
   Attempt,
   BankTransaction,
   Dashboard,
+  DownloadPaymentReportParams,
+  DownloadSampleReceiptParams,
   HealthStatus,
   ImportInput,
   ImportRecord,
@@ -1416,6 +1418,403 @@ export function useGetReports<TData = Awaited<ReturnType<typeof getReports>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetReportsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDownloadPaymentReportUrl = (params?: DownloadPaymentReportParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/vp/export.csv?${stringifiedParams}` : `/api/vp/export.csv`
+}
+
+/**
+ * Download with an anchor; accepts optional search and status filters.
+ */
+export const downloadPaymentReport = async (params?: DownloadPaymentReportParams, options?: Parameters<typeof customFetch>[1]): Promise<string> => {
+
+  return customFetch<string>(getDownloadPaymentReportUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadPaymentReportQueryKey = (params?: DownloadPaymentReportParams,) => {
+    return [
+    `/api/vp/export.csv`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDownloadPaymentReportQueryOptions = <TData = Awaited<ReturnType<typeof downloadPaymentReport>>, TError = ErrorType<unknown>>(params?: DownloadPaymentReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadPaymentReport>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadPaymentReportQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadPaymentReport>>> = ({ signal }) => downloadPaymentReport(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadPaymentReport>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadPaymentReportQueryResult = NonNullable<Awaited<ReturnType<typeof downloadPaymentReport>>>
+export type DownloadPaymentReportQueryError = ErrorType<unknown>
+
+
+export function useDownloadPaymentReport<TData = Awaited<ReturnType<typeof downloadPaymentReport>>, TError = ErrorType<unknown>>(
+ params: undefined |  DownloadPaymentReportParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadPaymentReport>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadPaymentReport>>,
+          TError,
+          Awaited<ReturnType<typeof downloadPaymentReport>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadPaymentReport<TData = Awaited<ReturnType<typeof downloadPaymentReport>>, TError = ErrorType<unknown>>(
+ params?: DownloadPaymentReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadPaymentReport>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadPaymentReport>>,
+          TError,
+          Awaited<ReturnType<typeof downloadPaymentReport>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadPaymentReport<TData = Awaited<ReturnType<typeof downloadPaymentReport>>, TError = ErrorType<unknown>>(
+ params?: DownloadPaymentReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadPaymentReport>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDownloadPaymentReport<TData = Awaited<ReturnType<typeof downloadPaymentReport>>, TError = ErrorType<unknown>>(
+ params?: DownloadPaymentReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadPaymentReport>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDownloadPaymentReportQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDownloadBankTemplateUrl = () => {
+
+
+
+
+  return `/api/vp/sample-bank.csv`
+}
+
+export const downloadBankTemplate = async ( options?: Parameters<typeof customFetch>[1]): Promise<string> => {
+
+  return customFetch<string>(getDownloadBankTemplateUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadBankTemplateQueryKey = () => {
+    return [
+    `/api/vp/sample-bank.csv`
+    ] as const;
+    }
+
+
+export const getDownloadBankTemplateQueryOptions = <TData = Awaited<ReturnType<typeof downloadBankTemplate>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadBankTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadBankTemplateQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadBankTemplate>>> = ({ signal }) => downloadBankTemplate({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadBankTemplate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadBankTemplateQueryResult = NonNullable<Awaited<ReturnType<typeof downloadBankTemplate>>>
+export type DownloadBankTemplateQueryError = ErrorType<unknown>
+
+
+export function useDownloadBankTemplate<TData = Awaited<ReturnType<typeof downloadBankTemplate>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadBankTemplate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadBankTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof downloadBankTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadBankTemplate<TData = Awaited<ReturnType<typeof downloadBankTemplate>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadBankTemplate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadBankTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof downloadBankTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadBankTemplate<TData = Awaited<ReturnType<typeof downloadBankTemplate>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadBankTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDownloadBankTemplate<TData = Awaited<ReturnType<typeof downloadBankTemplate>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadBankTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDownloadBankTemplateQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDownloadSampleReceiptUrl = (params: DownloadSampleReceiptParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/vp/sample-receipt.pdf?${stringifiedParams}` : `/api/vp/sample-receipt.pdf`
+}
+
+export const downloadSampleReceipt = async (params: DownloadSampleReceiptParams, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getDownloadSampleReceiptUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadSampleReceiptQueryKey = (params?: DownloadSampleReceiptParams,) => {
+    return [
+    `/api/vp/sample-receipt.pdf`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDownloadSampleReceiptQueryOptions = <TData = Awaited<ReturnType<typeof downloadSampleReceipt>>, TError = ErrorType<unknown>>(params: DownloadSampleReceiptParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSampleReceipt>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadSampleReceiptQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadSampleReceipt>>> = ({ signal }) => downloadSampleReceipt(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadSampleReceipt>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadSampleReceiptQueryResult = NonNullable<Awaited<ReturnType<typeof downloadSampleReceipt>>>
+export type DownloadSampleReceiptQueryError = ErrorType<unknown>
+
+
+export function useDownloadSampleReceipt<TData = Awaited<ReturnType<typeof downloadSampleReceipt>>, TError = ErrorType<unknown>>(
+ params: DownloadSampleReceiptParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSampleReceipt>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadSampleReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof downloadSampleReceipt>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadSampleReceipt<TData = Awaited<ReturnType<typeof downloadSampleReceipt>>, TError = ErrorType<unknown>>(
+ params: DownloadSampleReceiptParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSampleReceipt>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadSampleReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof downloadSampleReceipt>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadSampleReceipt<TData = Awaited<ReturnType<typeof downloadSampleReceipt>>, TError = ErrorType<unknown>>(
+ params: DownloadSampleReceiptParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSampleReceipt>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDownloadSampleReceipt<TData = Awaited<ReturnType<typeof downloadSampleReceipt>>, TError = ErrorType<unknown>>(
+ params: DownloadSampleReceiptParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadSampleReceipt>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDownloadSampleReceiptQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDownloadReceiptFileUrl = (id: string,) => {
+
+
+
+
+  return `/api/vp/receipts/${id}/file`
+}
+
+export const downloadReceiptFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getDownloadReceiptFileUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadReceiptFileQueryKey = (id: string,) => {
+    return [
+    `/api/vp/receipts/${id}/file`
+    ] as const;
+    }
+
+
+export const getDownloadReceiptFileQueryOptions = <TData = Awaited<ReturnType<typeof downloadReceiptFile>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadReceiptFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadReceiptFileQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadReceiptFile>>> = ({ signal }) => downloadReceiptFile(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadReceiptFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadReceiptFileQueryResult = NonNullable<Awaited<ReturnType<typeof downloadReceiptFile>>>
+export type DownloadReceiptFileQueryError = ErrorType<unknown>
+
+
+export function useDownloadReceiptFile<TData = Awaited<ReturnType<typeof downloadReceiptFile>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadReceiptFile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadReceiptFile>>,
+          TError,
+          Awaited<ReturnType<typeof downloadReceiptFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadReceiptFile<TData = Awaited<ReturnType<typeof downloadReceiptFile>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadReceiptFile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadReceiptFile>>,
+          TError,
+          Awaited<ReturnType<typeof downloadReceiptFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadReceiptFile<TData = Awaited<ReturnType<typeof downloadReceiptFile>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadReceiptFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDownloadReceiptFile<TData = Awaited<ReturnType<typeof downloadReceiptFile>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadReceiptFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDownloadReceiptFileQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

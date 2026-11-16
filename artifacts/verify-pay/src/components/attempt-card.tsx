@@ -1,6 +1,7 @@
 import { Landmark } from "lucide-react";
 import type { Attempt } from "@workspace/api-client-react";
 import { useI18n } from "@/lib/i18n";
+import { systemText } from "@/lib/system-text";
 import { fmtDate } from "@/lib/format";
 import { CheckList, Money, StatusBadge } from "@/components/kit";
 
@@ -25,14 +26,14 @@ export function MatchedTx({ attempt }: { attempt: Attempt }) {
 }
 
 export function AttemptCard({ attempt }: { attempt: Attempt }) {
-  const { t, locale } = useI18n();
+  const { t, locale, lang } = useI18n();
   return (
     <article className="rounded-2xl border border-border bg-card p-5" data-testid={`card-attempt-${attempt.id}`}>
       <header className="flex flex-wrap items-center justify-between gap-2">
         <StatusBadge status={attempt.status} size="lg" />
         <span className="text-xs text-muted-foreground">{fmtDate(attempt.createdAt, locale, true)}</span>
       </header>
-      <p className="mt-3 text-sm font-medium">{attempt.reason}</p>
+      <p className="mt-3 text-sm font-medium">{systemText(attempt.reason, lang)}</p>
       <div className="mt-5 grid gap-5 md:grid-cols-[1.2fr_1fr]">
         <div>
           <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("checks")}</p>

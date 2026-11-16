@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { AlertTriangle, CheckCircle2, CircleDashed, Copy, Eye, ShieldAlert, XCircle } from "lucide-react";
 import type { PaymentStatus, VerificationCheck } from "@workspace/api-client-react";
 import { useI18n } from "@/lib/i18n";
+import { systemText } from "@/lib/system-text";
 import { fmtAmount } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -134,7 +135,7 @@ export function RowsSkeleton({ rows = 6 }: { rows?: number }) {
 }
 
 export function CheckList({ checks }: { checks: VerificationCheck[] }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   return (
     <ol className="relative space-y-3 ps-1">
       <span className="absolute bottom-3 start-[13px] top-3 w-px bg-border" />
@@ -147,12 +148,12 @@ export function CheckList({ checks }: { checks: VerificationCheck[] }) {
             </span>
             <div className="min-w-0 pt-0.5">
               <p className="text-sm font-semibold">
-                {c.label}
+                {systemText(c.label, lang)}
                 <span className="ms-2 text-xs font-medium text-muted-foreground">
                   {c.passed === true ? t("check_passed") : c.passed === false ? t("check_failed") : t("check_skipped")}
                 </span>
               </p>
-              {c.detail && <p className="mt-0.5 break-words text-xs text-muted-foreground">{c.detail}</p>}
+              {c.detail && <p className="mt-0.5 break-words text-xs text-muted-foreground">{systemText(c.detail, lang)}</p>}
             </div>
           </li>
         );

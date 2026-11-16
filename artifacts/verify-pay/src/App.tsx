@@ -8,7 +8,7 @@ import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from "wo
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { I18nProvider, useI18n } from "@/lib/i18n";
+import { I18nProvider, useI18n, type TKey } from "@/lib/i18n";
 import { AppShell } from "@/components/shell";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
@@ -129,6 +129,32 @@ function HomeRedirect() {
   );
 }
 
+function RouteMetadata() {
+  const [location] = useLocation();
+  const { t, lang } = useI18n();
+  useEffect(() => {
+    const routes: Record<string, [TKey, TKey]> = {
+      "/": ["brand", "land_sub"],
+      "/dashboard": ["nav_dashboard", "tagline"],
+      "/payments": ["pay_title", "tagline"],
+      "/payments/new": ["new_request", "tagline"],
+      "/upload": ["up_title", "up_sub"],
+      "/bank-transactions": ["bank_title", "bank_sub"],
+      "/history": ["hist_title", "hist_sub"],
+      "/reports": ["rep_title", "rep_sub"],
+      "/settings": ["set_title", "set_sub"],
+    };
+    const keys = routes[location] ?? (location.startsWith("/sign-in") ? ["sign_in", "auth_signin_sub"] : location.startsWith("/sign-up") ? ["sign_up", "auth_signup_sub"] : ["detail_ref", "tagline"]);
+    const title = location === "/" ? "VERIFY PAY | " + t("tagline") : `${t(keys[0] as TKey)} | VERIFY PAY`;
+    const description = t(keys[1] as TKey);
+    document.title = title;
+    for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) document.querySelector(selector)?.setAttribute("content", title);
+    for (const selector of ['meta[name="description"]', 'meta[property="og:description"]', 'meta[name="twitter:description"]']) document.querySelector(selector)?.setAttribute("content", description);
+    document.querySelector('meta[name="robots"]')?.setAttribute("content", location === "/" ? "index, follow" : "noindex, nofollow");
+  }, [location, lang, t]);
+  return null;
+}
+
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
@@ -197,6 +223,7 @@ function ClerkProviderWithRoutes() {
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
     >
       <QueryClientProvider client={queryClient}>
+        <RouteMetadata />
         <ClerkQueryClientCacheInvalidator />
         <TooltipProvider>
           <Switch>

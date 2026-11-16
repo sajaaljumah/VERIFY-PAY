@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ChevronDown, History as HistoryIcon, Search } from "lucide-react";
 import { useListAttempts, type PaymentStatus } from "@workspace/api-client-react";
 import { useI18n } from "@/lib/i18n";
+import { systemText } from "@/lib/system-text";
 import { fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { CheckList, EmptyState, ErrorState, Money, PageHeader, Panel, RowsSkeleton, STATUS_STYLE, StatusBadge, StatusFilter } from "@/components/kit";
@@ -10,7 +11,7 @@ import { MatchedTx } from "@/components/attempt-card";
 import { useDebounced } from "@/pages/payments";
 
 export default function History() {
-  const { t, locale } = useI18n();
+  const { t, locale, lang } = useI18n();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<PaymentStatus | "">("");
   const [open, setOpen] = useState<string | null>(null);
@@ -41,7 +42,7 @@ export default function History() {
                   <button onClick={() => setOpen(isOpen ? null : a.id)} data-testid={`row-attempt-${a.id}`} className="flex w-full flex-col gap-2 px-5 py-4 text-start md:flex-row md:items-center md:gap-5">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold">{a.customerName} <span className="num ms-1 text-xs font-normal text-muted-foreground" dir="ltr">{a.orderId} · {a.reference}</span></p>
-                      <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{a.reason}</p>
+                      <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{systemText(a.reason, lang)}</p>
                     </div>
                     <div className="flex items-center gap-4">
                       <Money value={a.amount} className="text-sm font-semibold" />

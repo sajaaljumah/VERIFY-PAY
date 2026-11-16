@@ -1,6 +1,6 @@
 import { Link, useParams } from "wouter";
 import { ArrowLeft, Download, ExternalLink, FileText, SearchX, Upload } from "lucide-react";
-import { getGetPaymentQueryKey, useGetPayment, type Receipt } from "@workspace/api-client-react";
+import { getGetPaymentQueryKey, useGetPayment, useGetProfile, type Receipt } from "@workspace/api-client-react";
 import { useI18n } from "@/lib/i18n";
 import { fmtDate } from "@/lib/format";
 import { btnGhost, btnPrimary } from "@/lib/ui";
@@ -31,6 +31,7 @@ function ReceiptTile({ r }: { r: Receipt }) {
 
 export default function PaymentDetail() {
   const { t, locale } = useI18n();
+  const profile = useGetProfile();
   const { id = "" } = useParams<{ id: string }>();
   const q = useGetPayment(id, { query: { enabled: !!id, queryKey: getGetPaymentQueryKey(id) } });
   const status = (q.error as { status?: number } | null)?.status;
@@ -60,7 +61,7 @@ export default function PaymentDetail() {
               </div>
               <div className="mt-6 flex flex-wrap gap-2 border-t border-white/10 pt-5">
                 <Link href={`/upload?paymentId=${p.id}`} className={btnPrimary} data-testid="link-upload-receipt"><Upload className="size-4" />{t("upload_receipt")}</Link>
-                <a href={`/api/vp/sample-receipt.pdf?paymentId=${encodeURIComponent(p.id)}`} className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-white/80 ring-1 ring-white/20 hover:text-white" data-testid="link-sample-receipt"><Download className="size-4" />{t("sample_receipt")}</a>
+                {profile.data?.isDemo && <a href={`/api/vp/sample-receipt.pdf?paymentId=${encodeURIComponent(p.id)}`} className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-white/80 ring-1 ring-white/20 hover:text-white" data-testid="link-sample-receipt"><Download className="size-4" />{t("sample_receipt")}</a>}
               </div>
             </Panel>
             <div className="grid gap-5 lg:grid-cols-[1fr_2fr]">

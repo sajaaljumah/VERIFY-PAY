@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Download, Printer } from "lucide-react";
 import { useGetProfile, useGetReports, type PaymentStatus } from "@workspace/api-client-react";
 import { useI18n } from "@/lib/i18n";
+import { systemText } from "@/lib/system-text";
 import { fmtDate } from "@/lib/format";
 import { btnGhost, btnPrimary, inputCls } from "@/lib/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Disclaimer, ErrorState, Money, PageHeader, Panel, StatusBadge, StatusFilter } from "@/components/kit";
 
 export default function Reports() {
-  const { t, locale } = useI18n();
+  const { t, locale, lang } = useI18n();
   const q = useGetReports();
   const profile = useGetProfile();
   const [search, setSearch] = useState("");
@@ -66,7 +67,7 @@ export default function Reports() {
                           <td className="num px-4 py-2.5" dir="ltr">{a.reference}</td>
                           <td className="px-4 py-2.5"><Money value={a.amount} unit={false} /></td>
                           <td className="px-4 py-2.5"><StatusBadge status={a.status} /></td>
-                          <td className="max-w-xs px-4 py-2.5 text-xs text-muted-foreground">{a.reason}</td>
+                          <td className="max-w-xs px-4 py-2.5 text-xs text-muted-foreground">{systemText(a.reason, lang)}</td>
                         </tr>
                       ))}
                     </tbody>

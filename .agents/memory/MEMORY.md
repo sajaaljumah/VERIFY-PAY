@@ -1,0 +1,1 @@
+- [Private storage access](private-storage-access.md) — the bundled GCS client may attempt unavailable project-ID discovery; keep Replit sidecar signing as the credential boundary.

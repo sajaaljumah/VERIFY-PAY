@@ -44,7 +44,7 @@ router.post("/receipts/:id/extract", ocrLimiter, async (req, res): Promise<void>
       : providerError.code === "insufficient_quota"
         ? "The OpenAI account has no available API quota. Update the provider account to enable automatic extraction."
         : "Automatic extraction could not be completed.";
-    fields = { confidence: "low", extractionNote: `${note} Enter and review transaction details manually before matching against imported records.` };
+    fields = { confidence: "unprocessed", extractionNote: `${note} Enter and review transaction details manually before matching against imported records.` };
   }
   const [updated] = await db.update(receipts).set(fields).where(and(eq(receipts.id, id), eq(receipts.businessId, req.businessId))).returning();
   res.json(ExtractReceiptResponse.parse(await receiptJson(updated!)));

@@ -257,3 +257,12 @@ search?: string;
 status?: PaymentStatus;
 };
 
+export type DownloadPaymentReportParams = {
+search?: string;
+status?: string;
+};
+
+export type DownloadSampleReceiptParams = {
+paymentId: string;
+};
+
